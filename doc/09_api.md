@@ -40,16 +40,17 @@
 ### 게시판
 | 메서드 | 경로 | 설명 |
 |---|---|---|
-| GET | /boards | 게시판 목록 (그룹 권한 필터) |
-| GET | /boards/{boTable} | 게시판 설정 (공개 필드만) |
-| GET | /boards/{boTable}/posts | 목록 `?sca=분류&sfl=wr_subject&stx=검색어&spt=` (g5 파라미터명 유지) |
-| GET | /boards/{boTable}/posts/{wrId} | 보기 (조회수·읽기 포인트 처리) |
+| GET | /boards | 목록 권한(bo_list_level)이 있는 게시판 ✅ |
+| GET | /boards/{boTable}/posts | 목록 `?page&sca&sfl&stx&sop&spt&sst&sod` (g5 파라미터명 그대로). 응답에 게시판 설정 `board` 포함 ✅ |
+| GET | /boards/{boTable}/posts/{wrId} | 보기 + 첨부 + 댓글 + 이전/다음 + 권한. 조회수·읽기 포인트 처리. 비밀글은 헤더 `x-secret-grant` 필요 ✅ |
+| POST | /boards/{boTable}/posts/{wrId}/unlock | `{password, commentId?}` 비밀글/비밀댓글 비밀번호 확인 → `{grant}` (3시간) ✅ |
 | POST | /boards/{boTable}/posts | 쓰기 (multipart) |
 | POST | /boards/{boTable}/posts/{wrId}/replies | 답글 |
 | PATCH/DELETE | /boards/{boTable}/posts/{wrId} | 수정/삭제 (비회원은 `wr_password`) |
 | GET/POST | /boards/{boTable}/posts/{wrId}/comments | 댓글 / 대댓글(`parentCommentId`) |
 | POST | /boards/{boTable}/posts/{wrId}/good · /nogood | 추천/비추천 |
-| GET | /boards/{boTable}/posts/{wrId}/files/{bfNo} | 다운로드 (권한·포인트) |
+| GET | /boards/{boTable}/posts/{wrId}/files/{bfNo}?t= | 다운로드 (권한·포인트·횟수). `t` 는 보기 응답이 주는 1시간짜리 서명 토큰 ✅ |
+| GET | /boards/{boTable}/posts/{wrId}/files/{bfNo}/inline?t= | 본문 이미지 표시 (포인트·횟수 없음) ✅ |
 | GET | /new | 새글 |
 | GET | /search | 전체 검색 |
 
@@ -90,4 +91,4 @@
 ```
 
 ## 5. 에러 코드 (초안)
-`AUTH_EMPTY`, `AUTH_INVALID`, `AUTH_REQUIRED`, `AUTH_EXPIRED`, `AUTH_REUSED`, `AUTH_TOO_MANY`, `MEMBER_LEFT`, `MEMBER_INTERCEPTED`, `MEMBER_EMAIL_UNCERTIFIED`, `DB_DISABLED`, `BOARD_NOT_FOUND`, `BOARD_NO_PERMISSION`, `POST_SECRET`, `POINT_NOT_ENOUGH`, `WRITE_DELAY`(cf_delay_sec), `SHOP_SOLDOUT`, `SHOP_STOCK`, `PG_VERIFY_FAIL`, `LICENSE_INVALID`
+`AUTH_EMPTY`, `AUTH_INVALID`, `AUTH_REQUIRED`, `AUTH_EXPIRED`, `AUTH_REUSED`, `AUTH_TOO_MANY`, `MEMBER_LEFT`, `MEMBER_INTERCEPTED`, `MEMBER_EMAIL_UNCERTIFIED`, `DB_DISABLED`, `BOARD_NOT_FOUND`, `BOARD_NO_PERMISSION`, `POST_SECRET`, `POINT_NOT_ENOUGH`, `WRITE_DELAY`(cf_delay_sec), `BOARD_NOT_FOUND`, `BOARD_GROUP_DENIED`, `BOARD_CERT_REQUIRED`, `BOARD_ADULT_REQUIRED`, `POST_NOT_FOUND`, `POST_PASSWORD_WRONG`, `FILE_NOT_FOUND`, `FILE_TOKEN_INVALID`, `FILE_NO_PERMISSION`, `SHOP_SOLDOUT`, `SHOP_STOCK`, `PG_VERIFY_FAIL`, `LICENSE_INVALID`

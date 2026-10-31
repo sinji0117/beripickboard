@@ -25,6 +25,23 @@ impl FromRequestParts<AppState> for CurrentMember {
     }
 }
 
+/// 로그인했으면 Some (토큰이 없거나 만료면 None — 비회원으로 처리)
+pub struct OptionalMember(pub Option<Claims>);
+
+impl FromRequestParts<AppState> for OptionalMember {
+    type Rejection = AppError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+        let claims = parts
+            .headers
+            .get(header::AUTHORIZATION)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|v| v.strip_prefix("Bearer "))
+            .and_then(|t| jwt::verify(&state.0.config.jwt_secret, t));
+        Ok(Self(claims))
+    }
+}
+
 /// 요청자 IP / User-Agent
 pub struct ClientMeta {
     pub ip: String,

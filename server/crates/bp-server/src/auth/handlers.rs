@@ -125,7 +125,6 @@ async fn touch_today_login(s: &AppState, cfg: &G5Config, m: &Member, ip: &str, n
     }
     let (db, p) = (db(s)?, &s.0.config.prefix);
     if cfg.cf_login_point != 0 {
-        let pt = i32::try_from(cfg.cf_login_point).unwrap_or(0);
         point::insert_point(
             db,
             p,
@@ -133,7 +132,7 @@ async fn touch_today_login(s: &AppState, cfg: &G5Config, m: &Member, ip: &str, n
             now,
             PointInput {
                 mb_id: &m.mb_id,
-                point: pt,
+                point: cfg.cf_login_point,
                 content: &format!("{ymd} 첫로그인"),
                 rel_table: "@login",
                 rel_id: &m.mb_id,

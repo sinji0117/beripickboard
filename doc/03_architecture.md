@@ -112,7 +112,9 @@ beripickboard/
 - 첨부파일: `data/file/{bo_table}/{bf_file}`, 메타는 `g5_board_file`(`bf_storage` 컬럼으로 외부 스토리지 확장 대비).
 - 에디터 이미지: `data/editor/{yymm}/…` — 본문 HTML 내 절대경로를 그대로 서빙.
 - 상품 이미지: `data/item/{it_id}/…`, 회원 아이콘/이미지: `data/member/`, `data/member_image/`.
-- 다운로드는 반드시 API(`/api/boards/{bo_table}/posts/{wr_id}/files/{bf_no}`)를 거쳐 권한·포인트 차감 후 스트리밍.
+- 다운로드는 반드시 API(`/api/v1/boards/{bo_table}/posts/{wr_id}/files/{bf_no}?t=`)를 거쳐 권한·포인트 차감 후 스트리밍. `t` 는 글 보기 응답에만 들어 있는 HMAC 서명 토큰(1시간, 게시판·글·열람자 고정)이라 `<a href>` 로 바로 받을 수 있고, PHP 의 "보기 세션이 있어야 다운로드" 규칙과 같다.
+- PHP 세션 플래그 대응: 조회수·읽기/다운로드 포인트 중복 방지는 서버 메모리 캐시(열람자=회원 아이디 또는 비회원 IP, 3시간), 비밀글 열람 허가는 서명 토큰(`x-secret-grant`, 3시간)으로 대신한다.
+- 포인트는 `insert_point` / `insert_use_point`(FIFO 차감) / `get_point_sum`(소멸 처리)을 그대로 옮겼고 PHP 와 같은 named lock 을 쓴다.
 
 ## 7. 공존 운영 (PHP ↔ beripickboard)
 1. 단계 A: 읽기 전용 — 새 CMS는 조회만, 쓰기는 PHP.

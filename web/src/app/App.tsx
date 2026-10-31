@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from '../themes/basic/layout/Layout'
+import { BoardList, BoardView, LegacyBoardRedirect } from '../themes/basic/pages/Board'
 import { Index } from '../themes/basic/pages/Index'
 import { Login } from '../themes/basic/pages/Login'
 import { NotFound } from '../themes/basic/pages/NotFound'
@@ -20,6 +21,9 @@ export function App() {
           <Route element={<Layout />}>
             <Route index element={<Index />} />
             <Route path="login" element={<Login />} />
+            <Route path="b/:boTable" element={<BoardList />} />
+            <Route path="b/:boTable/:wrId" element={<BoardView />} />
+            <Route path="bbs/board.php" element={<LegacyBoardRedirect />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

@@ -1,4 +1,4 @@
-use crate::{auth::handlers as auth, error::AppError, state::AppState};
+use crate::{auth::handlers as auth, board::handlers as board, error::AppError, state::AppState};
 use axum::{
     Json, Router,
     extract::State,
@@ -13,7 +13,22 @@ pub fn router(state: AppState) -> Router {
         .route("/auth/login", post(auth::login))
         .route("/auth/refresh", post(auth::refresh_token))
         .route("/auth/logout", post(auth::logout))
-        .route("/members/me", get(auth::me));
+        .route("/members/me", get(auth::me))
+        .route("/boards", get(board::list_boards))
+        .route("/boards/{bo_table}/posts", get(board::list_posts))
+        .route("/boards/{bo_table}/posts/{wr_id}", get(board::view_post))
+        .route(
+            "/boards/{bo_table}/posts/{wr_id}/unlock",
+            post(board::unlock_post),
+        )
+        .route(
+            "/boards/{bo_table}/posts/{wr_id}/files/{no}",
+            get(board::download),
+        )
+        .route(
+            "/boards/{bo_table}/posts/{wr_id}/files/{no}/inline",
+            get(board::inline_image),
+        );
     Router::new()
         .nest("/api/v1", api)
         .fallback(|| async { AppError::not_found("NOT_FOUND", "요청한 경로가 없습니다.") })

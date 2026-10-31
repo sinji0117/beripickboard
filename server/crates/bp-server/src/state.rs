@@ -1,4 +1,4 @@
-use crate::{auth::ratelimit::LoginLimiter, config::Config};
+use crate::{auth::ratelimit::LoginLimiter, board::SeenCache, config::Config};
 use anyhow::Result;
 use sqlx::mysql::{MySqlConnectOptions, MySqlPool, MySqlPoolOptions};
 use std::{str::FromStr, sync::Arc, time::Duration};
@@ -12,6 +12,8 @@ pub struct Inner {
     pub redis: Option<redis::aio::ConnectionManager>,
     /// 로그인 실패 제한: 같은 IP+아이디 10분에 10회
     pub limiter: LoginLimiter,
+    /// 조회수·다운로드 중복 방지 (PHP 세션 플래그 대응)
+    pub seen: SeenCache,
 }
 
 impl AppState {
@@ -44,6 +46,7 @@ impl AppState {
             db,
             redis,
             limiter: limiter(),
+            seen: SeenCache::new(Duration::from_secs(3 * 3600)),
         })))
     }
 
@@ -54,6 +57,7 @@ impl AppState {
             db: None,
             redis: None,
             limiter: limiter(),
+            seen: SeenCache::new(Duration::from_secs(3 * 3600)),
         }))
     }
 }

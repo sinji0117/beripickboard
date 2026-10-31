@@ -15,6 +15,8 @@ pub struct Member {
     pub mb_intercept_date: String,
     pub mb_leave_date: String,
     pub mb_email_certify: String,
+    pub mb_certify: String,
+    pub mb_adult: i64,
 }
 
 pub async fn find(db: &MySqlPool, p: &Prefix, mb_id: &str) -> sqlx::Result<Option<Member>> {
@@ -22,7 +24,7 @@ pub async fn find(db: &MySqlPool, p: &Prefix, mb_id: &str) -> sqlx::Result<Optio
         "SELECT mb_id, mb_password, mb_name, mb_nick, mb_email, \
          CAST(mb_level AS SIGNED) AS mb_level, CAST(mb_point AS SIGNED) AS mb_point, \
          CAST(mb_today_login AS CHAR) AS mb_today_login, mb_intercept_date, mb_leave_date, \
-         CAST(mb_email_certify AS CHAR) AS mb_email_certify \
+         CAST(mb_email_certify AS CHAR) AS mb_email_certify, mb_certify, CAST(mb_adult AS SIGNED) AS mb_adult \
          FROM {} WHERE mb_id = ?",
         p.table("member")
     ))
