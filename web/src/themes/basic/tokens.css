@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/* basic 테마 디자인 토큰 (doc/04_development_rules.md §4) */
+@theme {
+  --color-brand-50: oklch(0.97 0.02 350);
+  --color-brand-500: oklch(0.62 0.2 355);
+  --color-brand-700: oklch(0.48 0.18 355);
+  --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+}
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+body {
+  @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+}

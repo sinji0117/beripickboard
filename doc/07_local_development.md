@@ -38,23 +38,26 @@ services:
 새로 시작하는 경우 `gnuboard5.sql` + `gnuboard5shop.sql`(그누보드5 저장소 `install/`)을 먼저 넣는다.
 
 ## 4. .env
+루트의 `.env.example` 을 `server/.env` 로 복사한다 (`bp-server`, `bp-migrate` 는 실행 위치의 `.env` 를 읽음).
 ```dotenv
 APP_ENV=local
 APP_ADDR=127.0.0.1:8080
 DATABASE_URL=mysql://beripick:beripick@127.0.0.1:3306/beripick
 G5_TABLE_PREFIX=g5_
 REDIS_URL=redis://127.0.0.1:6379
-DATA_PATH=./.local/data
+DATA_PATH=../.local/data
 JWT_SECRET=change-me-32bytes-min
 LICENSE_PUBLIC_KEY=   # 개발은 비워두면 dev 모드
 CORS_ORIGIN=http://localhost:5173
 ```
 `.env`는 커밋 금지, `.env.example`만 커밋.
 
+> 참고: `@vitejs/plugin-react` 6.x 는 Vite 8 전용이므로 Vite 7 에서는 5.x 를 쓴다.
+
 ## 5. 개발 서버
 ```bash
 # 백엔드
-cd server && cargo run -p bp-server        # http://127.0.0.1:8080
+cd server && cargo run -p bp-server        # http://127.0.0.1:8080/api/v1/health
 # 프론트
 cd web && pnpm install && pnpm dev          # http://localhost:5173 (/api → 8080 프록시)
 ```
