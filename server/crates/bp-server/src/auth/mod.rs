@@ -5,6 +5,7 @@ pub mod handlers;
 pub mod jwt;
 pub mod ratelimit;
 pub mod refresh;
+pub mod sign;
 
 pub const REFRESH_COOKIE: &str = "bp_rt";
 pub const REFRESH_COOKIE_PATH: &str = "/api/v1/auth";

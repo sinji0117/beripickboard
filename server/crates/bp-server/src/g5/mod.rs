@@ -1,8 +1,10 @@
 //! g5 테이블 접근 (읽기/쓰기는 PHP 그누보드와 같은 규칙으로).
 
+pub mod board;
 pub mod config;
 pub mod member;
 pub mod point;
+pub mod write;
 
 use chrono::{DateTime, FixedOffset, Utc};
 

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { Link, Outlet } from 'react-router'
+import { Link, NavLink, Outlet } from 'react-router'
+import { listBoards } from '../../../api/board'
 import { getSite } from '../../../api/client'
 import { useSession } from '../../../app/session'
 
@@ -8,6 +9,8 @@ import { useSession } from '../../../app/session'
 export function Layout() {
   const { data: site } = useQuery({ queryKey: ['site'], queryFn: getSite, staleTime: 300_000 })
   const { member, ready, logout } = useSession()
+  // 메뉴(g5_menu) 연동 전까지는 볼 수 있는 게시판을 메뉴로 사용
+  const { data: boards } = useQuery({ queryKey: ['boards', member?.mbId], queryFn: listBoards, staleTime: 300_000 })
   const title = site?.title || 'beripickboard'
 
   useEffect(() => {
@@ -21,7 +24,17 @@ export function Layout() {
           <Link to="/" className="text-lg font-bold text-brand-700">
             {title}
           </Link>
-          <nav className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">{/* g5_menu 연동 예정 */}</nav>
+          <nav className="flex flex-1 gap-4 overflow-x-auto text-sm text-zinc-600 dark:text-zinc-400">
+            {boards?.map((b) => (
+              <NavLink
+                key={b.boTable}
+                to={`/b/${b.boTable}`}
+                className={({ isActive }) => `whitespace-nowrap hover:text-brand-700 ${isActive ? 'font-semibold text-brand-700' : ''}`}
+              >
+                {b.subject}
+              </NavLink>
+            ))}
+          </nav>
           {/* g5 outlogin 대응 */}
           <div className="flex items-center gap-3 text-sm">
             {!ready ? null : member ? (

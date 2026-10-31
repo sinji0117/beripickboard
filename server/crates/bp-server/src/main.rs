@@ -1,6 +1,7 @@
 //! beripickboard API 서버.
 
 mod auth;
+mod board;
 mod config;
 mod error;
 mod g5;

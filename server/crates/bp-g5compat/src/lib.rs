@@ -3,6 +3,7 @@
 //! g5의 테이블 구조와 값의 의미를 바꾸지 않고 Rust에서 그대로 다루기 위한 헬퍼 모음.
 //! 기준: 그누보드 5.6.44 / 영카트 5.4.5.5.1 (doc/03_architecture.md)
 
+pub mod board;
 pub mod datetime;
 pub mod member;
 pub mod password;

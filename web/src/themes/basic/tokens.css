@@ -13,3 +13,16 @@
 body {
   @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
 }
+
+/* 게시글 HTML 본문 (Tailwind preflight 가 지운 기본 스타일 복원) */
+.prose-g5 p { margin: 0.5em 0; }
+.prose-g5 a { color: var(--color-brand-700); text-decoration: underline; }
+.prose-g5 img { max-width: 100%; height: auto; }
+.prose-g5 ul { list-style: disc; padding-left: 1.5em; }
+.prose-g5 ol { list-style: decimal; padding-left: 1.5em; }
+.prose-g5 table { border-collapse: collapse; }
+.prose-g5 td, .prose-g5 th { border: 1px solid #ddd; padding: 4px 8px; }
+.prose-g5 h1 { font-size: 1.5em; font-weight: 700; }
+.prose-g5 h2 { font-size: 1.3em; font-weight: 700; }
+.prose-g5 h3 { font-size: 1.15em; font-weight: 700; }
+.prose-g5 blockquote { border-left: 3px solid #ccc; padding-left: 1em; color: #666; }
