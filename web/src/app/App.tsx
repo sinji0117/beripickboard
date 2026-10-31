@@ -2,7 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from '../themes/basic/layout/Layout'
 import { Index } from '../themes/basic/pages/Index'
+import { Login } from '../themes/basic/pages/Login'
 import { NotFound } from '../themes/basic/pages/NotFound'
+import { SessionProvider } from './session'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
@@ -12,14 +14,17 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <SessionProvider>
+        <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Index />} />
+            <Route path="login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </SessionProvider>
     </QueryClientProvider>
   )
 }

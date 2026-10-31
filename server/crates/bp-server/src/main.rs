@@ -1,7 +1,9 @@
 //! beripickboard API 서버.
 
+mod auth;
 mod config;
 mod error;
+mod g5;
 mod routes;
 mod state;
 
@@ -24,6 +26,10 @@ async fn main() -> Result<()> {
         Some(o) => CorsLayer::new()
             .allow_origin(o.parse::<HeaderValue>()?)
             .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+            .allow_headers([
+                axum::http::header::CONTENT_TYPE,
+                axum::http::header::AUTHORIZATION,
+            ])
             .allow_credentials(true),
         None => CorsLayer::new(),
     };
@@ -34,9 +40,12 @@ async fn main() -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     tracing::info!(%addr, version = env!("CARGO_PKG_VERSION"), "beripickboard 서버 시작");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown())
-        .await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown())
+    .await?;
     Ok(())
 }
 

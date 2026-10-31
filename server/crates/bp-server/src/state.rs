@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::{auth::ratelimit::LoginLimiter, config::Config};
 use anyhow::Result;
 use sqlx::mysql::{MySqlConnectOptions, MySqlPool, MySqlPoolOptions};
 use std::{str::FromStr, sync::Arc, time::Duration};
@@ -10,6 +10,8 @@ pub struct Inner {
     pub config: Config,
     pub db: Option<MySqlPool>,
     pub redis: Option<redis::aio::ConnectionManager>,
+    /// 로그인 실패 제한: 같은 IP+아이디 10분에 10회
+    pub limiter: LoginLimiter,
 }
 
 impl AppState {
@@ -37,7 +39,12 @@ impl AppState {
             },
             None => None,
         };
-        Ok(Self(Arc::new(Inner { config, db, redis })))
+        Ok(Self(Arc::new(Inner {
+            config,
+            db,
+            redis,
+            limiter: limiter(),
+        })))
     }
 
     #[cfg(test)]
@@ -46,8 +53,13 @@ impl AppState {
             config,
             db: None,
             redis: None,
+            limiter: limiter(),
         }))
     }
+}
+
+fn limiter() -> LoginLimiter {
+    LoginLimiter::new(10, Duration::from_secs(600))
 }
 
 /// g5 호환 연결: sql_mode 를 비워 `0000-00-00` 기본값을 허용하고, utf8mb4 로 통신한다.

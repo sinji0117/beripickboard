@@ -101,8 +101,11 @@ beripickboard/
   | `sha256:12000:{salt}:{hash}` | `:` 4분할 | PBKDF2-HMAC-SHA256, salt는 base64 문자열 자체를 salt로 사용, 키 길이 24바이트 |
   | `*` + 40 hex | MySQL `PASSWORD()` | `'*' + UPPER(HEX(SHA1(SHA1(pw))))` |
   | 16 hex | `OLD_PASSWORD()` | 검증 후 즉시 PBKDF2로 재해시 |
-- 공존 기간에는 **새 해시도 g5 PBKDF2 형식으로 저장**(PHP 쪽 로그인 유지). 완전 전환 후 Argon2id 로 승급 옵션.
-- 세션: Access JWT(15분) + Refresh 토큰(Redis, 14일, HttpOnly 쿠키). PHP 세션과는 공유하지 않음.
+- 공존 기간에는 **새 해시도 g5 PBKDF2 형식으로 저장**(PHP 쪽 로그인 유지). 약한 해시의 로그인 시 재저장은 `G5_REHASH_ON_LOGIN=true` 일 때만(PHP가 `create_hash` 설정일 때). 완전 전환 후 Argon2id 로 승급 옵션.
+- 세션: Access JWT(HS256, 15분, 메모리 보관) + Refresh 토큰(HttpOnly 쿠키 `bp_rt`, `bp_refresh_token` 테이블에 SHA-256 해시만 저장). 회전 방식이며 이미 쓴 토큰이 다시 오면 같은 패밀리 전체 폐기. PHP 세션과는 공유하지 않음.
+- 로그인 규칙은 `bbs/login_check.php` 와 동일: 아이디·비번 trim, 차단일(`mb_intercept_date`)·탈퇴일(`mb_leave_date`) Ymd 비교, `cf_use_email_certify` 시 메일인증 확인, 최고관리자(`cf_admin`) 자동로그인 금지.
+- 오늘 첫 접속 시(common.php) `cf_login_point` 지급(`@login` / mb_id / Y-m-d, PHP와 같은 `GET_LOCK('g5pt_'+md5)` 사용) + `mb_today_login`, `mb_login_ip` 갱신.
+- 로그인 실패 제한: 같은 IP+아이디 10분 10회 (단일 인스턴스 메모리, 다중 인스턴스 시 Redis 로 교체).
 
 ## 6. 파일 스토리지
 - `DATA_PATH`를 기존 g5 `data/` 디렉토리로 지정 → 첨부파일 그대로 사용.

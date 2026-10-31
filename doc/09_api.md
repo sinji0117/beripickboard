@@ -18,18 +18,19 @@
 | 토큰 | 수명 | 저장 | 클레임 |
 |---|---|---|---|
 | Access (JWT HS256) | 15분 | 메모리 | `sub`=mb_id, `lvl`=mb_level, `adm`=관리자 여부, `exp` |
-| Refresh (opaque) | 14일 | Redis + bp_refresh_token, 쿠키 | 회전(rotate) 방식, 재사용 감지 시 전체 폐기 |
+| Refresh (opaque, 32바이트 hex) | 자동로그인 14일 / 일반 1일(세션 쿠키) | bp_refresh_token(해시), 쿠키 `bp_rt` (HttpOnly, SameSite=Lax, Path=/api/v1/auth, 운영 Secure) | 회전 방식, 재사용 감지 시 패밀리 전체 폐기 |
 
 ## 3. 엔드포인트 (v0.1.0 범위)
 
 ### 인증 · 회원
 | 메서드 | 경로 | 설명 |
 |---|---|---|
-| POST | /auth/login | `{mbId, password, autoLogin}` |
-| POST | /auth/refresh | 리프레시 회전 |
-| POST | /auth/logout | |
+| POST | /auth/login | `{mbId, password, autoLogin}` → `{data:{accessToken, expiresIn, member}}` + `Set-Cookie: bp_rt` ✅ |
+| POST | /auth/refresh | 쿠키 `bp_rt` 로 재발급·회전, 응답 형식은 login 과 동일 ✅ |
+| POST | /auth/logout | 같은 패밀리 리프레시 전체 폐기, 204 ✅ |
 | POST | /members | 회원가입 (`cf_register_level`, `cf_register_point` 적용) |
-| GET/PATCH | /members/me | 내 정보 |
+| GET | /members/me | 내 정보 `{mbId, mbNick, mbName, mbEmail, mbLevel, mbPoint, isAdmin}` ✅ |
+| PATCH | /members/me | 정보 수정 |
 | DELETE | /members/me | 탈퇴 (`mb_leave_date` 기록) |
 | POST | /members/password-lost | 비밀번호 찾기 |
 | GET | /members/me/points | 포인트 내역 (g5_point) |
@@ -55,6 +56,7 @@
 ### 콘텐츠 · 위젯
 | 메서드 | 경로 |
 |---|---|
+| GET | /site — `{title, theme}` (g5_config) ✅ |
 | GET | /contents/{coId}, /faq, /qa, /menus, /popups, /polls/{poId}, /widgets?slot= |
 
 ### 쇼핑몰
@@ -88,4 +90,4 @@
 ```
 
 ## 5. 에러 코드 (초안)
-`AUTH_INVALID`, `AUTH_EXPIRED`, `MEMBER_LEFT`, `MEMBER_INTERCEPTED`, `BOARD_NOT_FOUND`, `BOARD_NO_PERMISSION`, `POST_SECRET`, `POINT_NOT_ENOUGH`, `WRITE_DELAY`(cf_delay_sec), `SHOP_SOLDOUT`, `SHOP_STOCK`, `PG_VERIFY_FAIL`, `LICENSE_INVALID`
+`AUTH_EMPTY`, `AUTH_INVALID`, `AUTH_REQUIRED`, `AUTH_EXPIRED`, `AUTH_REUSED`, `AUTH_TOO_MANY`, `MEMBER_LEFT`, `MEMBER_INTERCEPTED`, `MEMBER_EMAIL_UNCERTIFIED`, `DB_DISABLED`, `BOARD_NOT_FOUND`, `BOARD_NO_PERMISSION`, `POST_SECRET`, `POINT_NOT_ENOUGH`, `WRITE_DELAY`(cf_delay_sec), `SHOP_SOLDOUT`, `SHOP_STOCK`, `PG_VERIFY_FAIL`, `LICENSE_INVALID`

@@ -4,7 +4,9 @@
 //! 기준: 그누보드 5.6.44 / 영카트 5.4.5.5.1 (doc/03_architecture.md)
 
 pub mod datetime;
+pub mod member;
 pub mod password;
+pub mod point;
 pub mod table;
 
 /// 그누보드 5.6.44 `install/gnuboard5.sql` 의 테이블 (접두사 제외).
