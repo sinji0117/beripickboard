@@ -1,0 +1,17 @@
+[package]
+name = "bp-migrate"
+description = "g5 DB 점검 및 beripickboard(bp_*) 스키마 마이그레이션 CLI"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+bp-g5compat.workspace = true
+dotenvy.workspace = true
+sqlx = { workspace = true, features = ["migrate"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

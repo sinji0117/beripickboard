@@ -4,3 +4,4 @@ server/target/
 web/node_modules/
 web/dist/
 *.log
+server/.env

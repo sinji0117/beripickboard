@@ -1,0 +1,22 @@
+[package]
+name = "bp-g5compat"
+description = "그누보드5/영카트5 호환 계층: 비밀번호 해시, 테이블 이름, 날짜 처리"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+base64.workspace = true
+chrono.workspace = true
+hex.workspace = true
+hmac.workspace = true
+pbkdf2.workspace = true
+regex.workspace = true
+sha1.workspace = true
+sha2.workspace = true
+subtle.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
