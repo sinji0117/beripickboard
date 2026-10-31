@@ -1,13 +1,35 @@
-use crate::{error::AppError, state::AppState};
-use axum::{Json, Router, extract::State, routing::get};
+use crate::{auth::handlers as auth, error::AppError, state::AppState};
+use axum::{
+    Json, Router,
+    extract::State,
+    routing::{get, post},
+};
 use serde::Serialize;
 
 pub fn router(state: AppState) -> Router {
-    let api = Router::new().route("/health", get(health));
+    let api = Router::new()
+        .route("/health", get(health))
+        .route("/site", get(site))
+        .route("/auth/login", post(auth::login))
+        .route("/auth/refresh", post(auth::refresh_token))
+        .route("/auth/logout", post(auth::logout))
+        .route("/members/me", get(auth::me));
     Router::new()
         .nest("/api/v1", api)
         .fallback(|| async { AppError::not_found("NOT_FOUND", "요청한 경로가 없습니다.") })
         .with_state(state)
+}
+
+/// GET /api/v1/site — 사이트 공개 정보 (g5_config)
+async fn site(State(s): State<AppState>) -> Result<Json<serde_json::Value>, AppError> {
+    let db =
+        s.0.db
+            .as_ref()
+            .ok_or_else(|| AppError::unavailable("DB_DISABLED", "DB가 설정되지 않았습니다."))?;
+    let cfg = crate::g5::config::load(db, &s.0.config.prefix).await?;
+    Ok(Json(
+        serde_json::json!({ "data": { "title": cfg.cf_title, "theme": cfg.cf_theme } }),
+    ))
 }
 
 #[derive(Serialize)]
@@ -60,16 +82,7 @@ mod tests {
     use tower::ServiceExt;
 
     fn app() -> Router {
-        let cfg = Config {
-            app_env: "test".into(),
-            addr: ([127, 0, 0, 1], 0).into(),
-            database_url: None,
-            redis_url: None,
-            prefix: Default::default(),
-            data_path: ".".into(),
-            cors_origin: None,
-        };
-        router(AppState::without_backends(cfg))
+        router(AppState::without_backends(Config::for_test()))
     }
 
     async fn call(uri: &str) -> (u16, serde_json::Value) {

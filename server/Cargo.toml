@@ -3,7 +3,7 @@ resolver = "2"
 members = ["crates/bp-server", "crates/bp-g5compat", "crates/bp-migrate"]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.0.3"
 edition = "2024"
 license = "UNLICENSED"
 publish = false
@@ -30,6 +30,9 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 regex = "1"
+getrandom = "0.3"
+jsonwebtoken = "9"
+md-5 = "0.10"
 
 bp-g5compat = { path = "crates/bp-g5compat" }
 

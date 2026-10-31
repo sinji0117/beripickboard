@@ -47,6 +47,9 @@ G5_TABLE_PREFIX=g5_
 REDIS_URL=redis://127.0.0.1:6379
 DATA_PATH=../.local/data
 JWT_SECRET=change-me-32bytes-min
+APP_TZ_OFFSET_HOURS=9
+G5_REHASH_ON_LOGIN=false
+TRUST_PROXY=false
 LICENSE_PUBLIC_KEY=   # 개발은 비워두면 dev 모드
 CORS_ORIGIN=http://localhost:5173
 ```

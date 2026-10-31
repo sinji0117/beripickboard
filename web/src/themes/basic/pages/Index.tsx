@@ -13,7 +13,7 @@ export function Index() {
 
   return (
     <section className="space-y-4">
-      <h1 className="text-2xl font-bold">베리픽보드 v0.0.1</h1>
+      <h1 className="text-2xl font-bold">베리픽보드 v{data?.version ?? ''}</h1>
       <p className="text-zinc-600 dark:text-zinc-400">
         그누보드5 · 영카트5 · 이윰보드4 호환 CMS — 개발 뼈대가 동작 중입니다.
       </p>

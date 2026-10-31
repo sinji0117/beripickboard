@@ -19,12 +19,36 @@ pub enum AppError {
 }
 
 impl AppError {
-    pub fn not_found(code: &'static str, message: impl Into<String>) -> Self {
+    fn http(status: StatusCode, code: &'static str, message: impl Into<String>) -> Self {
         Self::Http {
-            status: StatusCode::NOT_FOUND,
+            status,
             code,
             message: message.into(),
         }
+    }
+    pub fn bad_request(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::BAD_REQUEST, code, m)
+    }
+    pub fn unauthorized(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::UNAUTHORIZED, code, m)
+    }
+    pub fn forbidden(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::FORBIDDEN, code, m)
+    }
+    pub fn not_found(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::NOT_FOUND, code, m)
+    }
+    pub fn too_many(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::TOO_MANY_REQUESTS, code, m)
+    }
+    pub fn unavailable(code: &'static str, m: impl Into<String>) -> Self {
+        Self::http(StatusCode::SERVICE_UNAVAILABLE, code, m)
+    }
+}
+
+impl From<sqlx::Error> for AppError {
+    fn from(e: sqlx::Error) -> Self {
+        Self::Internal(e.into())
     }
 }
 
@@ -49,3 +73,5 @@ impl IntoResponse for AppError {
         (status, Json(body)).into_response()
     }
 }
+
+pub type AppResult<T> = Result<T, AppError>;
